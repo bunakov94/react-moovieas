@@ -1,0 +1,30 @@
+.nav {
+  text-align: center;
+
+  &__link {
+    position: relative;
+    color: #1890ff;
+    text-decoration: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -11px;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background-color: #1890ff;
+      transition: width 0.3s;
+    }
+    &:hover::after {
+      width: 100%;
+    }
+    &:active {
+      width: 100%;
+    }
+
+    &:not(:last-child) {
+      margin-right: 16px;
+    }
+  }
+}
