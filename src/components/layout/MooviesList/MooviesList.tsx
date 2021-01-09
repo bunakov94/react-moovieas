@@ -1,16 +1,12 @@
 import React from 'react';
 import Moovie from '../../blocks/Moovie';
+
 import './MooviesList.scss';
 
 const MooviesList = () => (
-  <div>
+  <main className="moovie-list">
     <Moovie />
-    <Moovie />
-    <Moovie />
-    <Moovie />
-    <Moovie />
-    <Moovie />
-  </div>
+  </main>
 );
 
 export default MooviesList;
