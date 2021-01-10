@@ -1,16 +1,19 @@
 export type AppState = {
-  // currentPageMoovies: ICurrentPageMoovies[];
+  genres?: IGenre[];
+  results?: IResults[];
+  pageNumber?: number;
+  totalResults?: number;
 };
 export type AppProps = {};
 
 export type MoovieListProps = {
   // cutText: (text: string, limit: number) => string;
-  // currentPageMoovies: ICurrentPageMoovies[];
+  // currentPageMoovies: IResults[];
 };
 
 export type MoovieProps = {};
 
-export interface ICurrentPageMoovies {
+export interface IResults {
   adult: boolean;
   backdrop_path: string;
   genre_ids: number[];
@@ -25,4 +28,9 @@ export interface ICurrentPageMoovies {
   popularity: number;
   vote_average: number;
   vote_count: number;
+}
+
+interface IGenre {
+  id: number;
+  name: string;
 }
