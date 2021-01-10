@@ -12,7 +12,9 @@ export default class App extends Component<AppProps, AppState> {
   constructor(props: AppState) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      results: [],
+    };
   }
 
   componentDidMount() {
@@ -59,13 +61,12 @@ export default class App extends Component<AppProps, AppState> {
   }
 
   render() {
-    const { results, genres } = this.state;
-    console.log(results, genres);
+    const { results } = this.state;
 
     return (
       <>
         <Header />
-        <MooviesList />
+        <MooviesList moovies={results} />
       </>
     );
   }

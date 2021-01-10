@@ -1,11 +1,14 @@
 import React from 'react';
+import { MoovieListProps, IResults } from '../../types/interfaces';
 import Moovie from '../../blocks/Moovie';
 
 import './MooviesList.scss';
 
-const MooviesList = () => (
+const MooviesList = ({ moovies }: MoovieListProps) => (
   <main className="moovie-list">
-    <Moovie />
+    {moovies.map((moovie: IResults) => (
+      <Moovie key={moovie.id} {...moovie} />
+    ))}
   </main>
 );
 

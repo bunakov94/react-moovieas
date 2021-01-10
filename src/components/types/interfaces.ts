@@ -1,36 +1,22 @@
 export type AppState = {
-  genres?: IGenre[];
-  results?: IResults[];
-  pageNumber?: number;
-  totalResults?: number;
+  results: IResults[];
 };
 export type AppProps = {};
 
 export type MoovieListProps = {
   // cutText: (text: string, limit: number) => string;
-  // currentPageMoovies: IResults[];
+  moovies: IResults[];
 };
 
 export type MoovieProps = {};
 
 export interface IResults {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: number[];
+  genres: string[];
   id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  poster_path: string;
-  release_date: string;
+  description: string;
+  poster: string;
+  release: string;
   title: string;
-  video: boolean;
-  popularity: number;
-  vote_average: number;
-  vote_count: number;
-}
-
-interface IGenre {
-  id: number;
-  name: string;
+  rating: number;
+  isRate: boolean;
 }
