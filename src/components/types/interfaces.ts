@@ -1,15 +1,12 @@
 export type AppState = {
-  cards: IResults[];
+  cards: ICard[];
 };
 export type AppProps = {};
 
-export type MoovieListProps = {
-  moovies: IResults[];
+export type CardListProps = {
+  cards: ICard[];
 };
-
-export type MoovieProps = {};
-
-export interface IResults {
+export interface ICard {
   genres: string[];
   id: number;
   description: string;
@@ -20,11 +17,11 @@ export interface IResults {
   isRate: boolean;
 }
 
-export type TGenres = {
+export type Genres = {
   [id: number]: string;
 };
 
-export interface IMoovieResponse {
+export interface IMoovieDBRespons {
   adult: boolean;
   backdrop_path: string;
   genre_ids: number[];
@@ -41,7 +38,7 @@ export interface IMoovieResponse {
   vote_count: number;
 }
 
-export interface IMoovieCard {
+export interface IMoovieDBResponsWithGenres {
   adult: boolean;
   backdrop_path: string;
   genre_ids: string[];

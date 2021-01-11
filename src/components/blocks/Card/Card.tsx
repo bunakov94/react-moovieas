@@ -1,9 +1,9 @@
 import React from 'react';
 import format from 'date-fns/format';
-import { IResults } from '../../types/interfaces';
-import './Moovie.scss';
+import { ICard } from '../../types/interfaces';
+import './Card.scss';
 
-const Moovie = ({ genres, description, poster, release, title, rating }: IResults) => {
+const Card = ({ genres, description, poster, release, title, rating }: ICard) => {
   const cutTex = (text: string, limit: number) => {
     if (text.length < limit) {
       return text;
@@ -49,4 +49,4 @@ const Moovie = ({ genres, description, poster, release, title, rating }: IResult
   );
 };
 
-export default Moovie;
+export default Card;

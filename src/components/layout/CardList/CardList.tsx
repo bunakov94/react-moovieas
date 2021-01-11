@@ -1,13 +1,13 @@
 import React from 'react';
-import { MoovieListProps, IResults } from '../../types/interfaces';
-import Moovie from '../../blocks/Moovie';
+import { CardListProps, ICard } from '../../types/interfaces';
+import Card from '../../blocks/Card';
 
 import './CardList.scss';
 
-const CardList = ({ moovies }: MoovieListProps) => (
+const CardList = ({ cards }: CardListProps) => (
   <main className="moovie-list">
-    {moovies.map((moovie: IResults) => (
-      <Moovie key={moovie.id} {...moovie} />
+    {cards.map((card: ICard) => (
+      <Card key={card.id} {...card} />
     ))}
   </main>
 );

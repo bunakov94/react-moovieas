@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { AppState, AppProps, TGenres, IMoovieResponse, IResults, IMoovieCard } from './components/types/interfaces';
+import {
+  AppState,
+  AppProps,
+  Genres,
+  IMoovieDBRespons,
+  ICard,
+  IMoovieDBResponsWithGenres,
+} from './components/types/interfaces';
 import MoovieDB from './components/getData';
 import Header from './components/layout/Header';
 import CardList from './components/layout/CardList';
@@ -24,7 +31,7 @@ export default class App extends Component<AppProps, AppState> {
         .getGenres()
         .then((res) => res.genres)
         .then((res) => {
-          const result: TGenres = {};
+          const result: Genres = {};
           for (const genre of res) {
             result[genre.id] = genre.name;
           }
@@ -34,7 +41,7 @@ export default class App extends Component<AppProps, AppState> {
       .then((res) => {
         const cards = res[0];
         const genres = res[1];
-        cards.forEach((card: IMoovieResponse, cardIndex: number) => {
+        cards.forEach((card: IMoovieDBRespons, cardIndex: number) => {
           card.genre_ids.forEach((genreId: number, genreIndex: number) => {
             cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
           });
@@ -42,8 +49,8 @@ export default class App extends Component<AppProps, AppState> {
         return cards;
       })
       .then((res) => {
-        const cards = res.reduce((acc: IResults[], el: IMoovieCard) => {
-          const card: IResults = {
+        const cards = res.reduce((acc: ICard[], el: IMoovieDBResponsWithGenres) => {
+          const card: ICard = {
             genres: el.genre_ids,
             id: el.id,
             description: el.overview,
@@ -68,7 +75,7 @@ export default class App extends Component<AppProps, AppState> {
     return (
       <>
         <Header />
-        <CardList moovies={cards} />
+        <CardList cards={cards} />
       </>
     );
   }
