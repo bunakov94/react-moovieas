@@ -1,5 +1,7 @@
 export type AppState = {
   cards: ICard[];
+  isLoading: boolean;
+  isError: boolean;
 };
 export type AppProps = {};
 

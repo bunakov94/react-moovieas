@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Alert } from 'antd';
+
 import {
   AppState,
   AppProps,
@@ -8,6 +10,8 @@ import {
   IMoovieDBResponsWithGenres,
 } from './components/types/interfaces';
 import MoovieDB from './components/getData';
+import 'antd/dist/antd.css';
+import Spiner from './components/blocks/Spiner';
 import Header from './components/layout/Header';
 import CardList from './components/layout/CardList';
 
@@ -21,12 +25,14 @@ export default class App extends Component<AppProps, AppState> {
 
     this.state = {
       cards: [],
+      isLoading: true,
+      isError: false,
     };
   }
 
   componentDidMount() {
     Promise.all([
-      this.moovieDB.getPage(5).then((res) => res.results),
+      this.moovieDB.getPage(1).then((res) => res.results),
       this.moovieDB
         .getGenres()
         .then((res) => res.genres)
@@ -65,17 +71,38 @@ export default class App extends Component<AppProps, AppState> {
         }, []);
         this.setState({
           cards,
+          isLoading: false,
         });
-      });
+      })
+      .catch(this.onError);
   }
 
+  onError = () => {
+    this.setState({ isError: true, isLoading: false });
+  };
+
   render() {
-    const { cards } = this.state;
+    const { cards, isLoading, isError } = this.state;
 
     return (
       <>
-        <Header />
-        <CardList cards={cards} />
+        {isLoading ? (
+          <Spiner />
+        ) : (
+          <>
+            {isError ? (
+              <>
+                <Header />
+                <Alert message="Error" description="Something wrong... Try again" type="error" showIcon />
+              </>
+            ) : (
+              <>
+                <Header />
+                <CardList cards={cards} />
+              </>
+            )}
+          </>
+        )}
       </>
     );
   }
