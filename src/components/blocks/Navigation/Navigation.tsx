@@ -5,10 +5,10 @@ import 'antd/dist/antd.css';
 
 const { TabPane } = Tabs;
 
-const Navigation = () => (
+const Navigation = ({ onChangeInput, searchValue }: any) => (
   <Tabs defaultActiveKey="1" centered>
     <TabPane tab="Search" key="1">
-      <Search />
+      <Search onChangeInput={onChangeInput} searchValue={searchValue} />
     </TabPane>
     <TabPane tab="Rated" key="2" />
   </Tabs>

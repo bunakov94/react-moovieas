@@ -9,9 +9,9 @@ export default class MoovieDB {
     return res.json();
   }
 
-  getPage(pageNumber: number) {
+  getPage(pageNumber: number, query: string) {
     return this.getResources(
-      `search/movie?api_key=edc55cfd07c269b11eeeec5793477440&language=en-US&query=return&page=${pageNumber}&include_adult=false`,
+      `search/movie?api_key=edc55cfd07c269b11eeeec5793477440&language=en-US&query=${query}&page=${pageNumber}&include_adult=false`,
     );
   }
 

@@ -2,6 +2,8 @@ export type AppState = {
   cards: ICard[];
   isLoading: boolean;
   isError: boolean;
+  searchValue: string;
+  genres: Genres;
 };
 export type AppProps = {};
 
@@ -26,7 +28,7 @@ export type Genres = {
 export interface IMoovieDBRespons {
   adult: boolean;
   backdrop_path: string;
-  genre_ids: number[];
+  genre_ids: any;
   id: number;
   original_language: string;
   original_title: string;

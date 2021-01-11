@@ -3,9 +3,9 @@ import Navigation from '../../blocks/Navigation';
 
 import './Header.scss';
 
-const Header = () => (
+const Header = ({ onChangeInput, searchValue }: any) => (
   <header>
-    <Navigation />
+    <Navigation onChangeInput={onChangeInput} searchValue={searchValue} />
   </header>
 );
 

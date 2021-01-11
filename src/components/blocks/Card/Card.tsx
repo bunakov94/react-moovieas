@@ -30,7 +30,9 @@ const Card = ({ genres, description, poster, release, title, rating }: ICard) =>
             <h1 className="moovie-description__name">{title}</h1>
             <div className="moovie-description__rating">{rating}</div>
           </header>
-          <p className="moovie-description__release">{format(new Date(release), 'LLLL d, yyyy')}</p>
+          <p className="moovie-description__release">
+            {release ? format(new Date(release), 'LLLL d, yyyy') : 'Unknown'}
+          </p>
           <div className="moovie-description__genre">
             {genres
               ? genres.map((genre, index) => (

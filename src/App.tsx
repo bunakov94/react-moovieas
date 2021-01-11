@@ -27,62 +27,113 @@ export default class App extends Component<AppProps, AppState> {
       cards: [],
       isLoading: true,
       isError: false,
+      searchValue: 'return',
+      genres: {},
     };
   }
 
   componentDidMount() {
-    Promise.all([
-      this.moovieDB.getPage(1).then((res) => res.results),
-      this.moovieDB
-        .getGenres()
-        .then((res) => res.genres)
+    const { searchValue } = this.state;
+    if (searchValue !== '') {
+      Promise.all([
+        this.moovieDB.getPage(1, searchValue).then((res) => res.results),
+        this.moovieDB
+          .getGenres()
+          .then((res) => res.genres)
+          .then((res) => {
+            const result: Genres = {};
+            for (const genre of res) {
+              result[genre.id] = genre.name;
+            }
+            this.setState({ genres: result });
+            return result;
+          }),
+      ])
         .then((res) => {
-          const result: Genres = {};
-          for (const genre of res) {
-            result[genre.id] = genre.name;
-          }
-          return result;
-        }),
-    ])
-      .then((res) => {
-        const cards = res[0];
-        const genres = res[1];
-        cards.forEach((card: IMoovieDBRespons, cardIndex: number) => {
-          card.genre_ids.forEach((genreId: number, genreIndex: number) => {
-            cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
+          const cards = res[0];
+          const genres = res[1];
+          cards.forEach((card: IMoovieDBRespons, cardIndex: number) => {
+            card.genre_ids.forEach((genreId: number, genreIndex: number) => {
+              cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
+            });
           });
-        });
-        return cards;
-      })
-      .then((res) => {
-        const cards = res.reduce((acc: ICard[], el: IMoovieDBResponsWithGenres) => {
-          const card: ICard = {
-            genres: el.genre_ids,
-            id: el.id,
-            description: el.overview,
-            poster: el.poster_path,
-            release: el.release_date,
-            title: el.title,
-            rating: el.vote_average,
-            isRate: false,
-          };
-          acc.push(card);
-          return acc;
-        }, []);
-        this.setState({
-          cards,
-          isLoading: false,
-        });
-      })
-      .catch(this.onError);
+          return cards;
+        })
+        .then((res) => {
+          const cards = res.reduce((acc: ICard[], el: IMoovieDBResponsWithGenres) => {
+            const card: ICard = {
+              genres: el.genre_ids,
+              id: el.id,
+              description: el.overview,
+              poster: el.poster_path,
+              release: el.release_date,
+              title: el.title,
+              rating: el.vote_average,
+              isRate: false,
+            };
+            acc.push(card);
+            return acc;
+          }, []);
+          this.setState({
+            cards,
+            isLoading: false,
+          });
+        })
+        .catch(this.onError);
+    }
   }
 
   onError = () => {
     this.setState({ isError: true, isLoading: false });
   };
 
+  onChangeInput = (text: string) => {
+    const { genres } = this.state;
+
+    this.setState({ searchValue: text });
+    if (text !== '') {
+      // TODO:
+      // Debounce
+      // Offline
+      new Promise((resolve) => {
+        const result = this.moovieDB.getPage(1, text).then((res) => res.results);
+        resolve(result);
+      })
+        .then((res) => {
+          const cards = res as IMoovieDBRespons[];
+          cards.forEach((card, cardIndex) => {
+            card.genre_ids.forEach((genreId: number, genreIndex: number) => {
+              cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
+            });
+          });
+          return cards;
+        })
+        .then((res) => {
+          const cards = res.reduce((acc: ICard[], el: IMoovieDBResponsWithGenres) => {
+            const card: ICard = {
+              genres: el.genre_ids,
+              id: el.id,
+              description: el.overview,
+              poster: el.poster_path,
+              release: el.release_date,
+              title: el.title,
+              rating: el.vote_average,
+              isRate: false,
+            };
+            acc.push(card);
+            return acc;
+          }, []);
+          this.setState({
+            cards,
+            isLoading: false,
+          });
+        })
+        .catch(this.onError);
+    }
+  };
+
   render() {
-    const { cards, isLoading, isError } = this.state;
+    const { cards, isLoading, isError, searchValue } = this.state;
 
     return (
       <>
@@ -97,7 +148,7 @@ export default class App extends Component<AppProps, AppState> {
               </>
             ) : (
               <>
-                <Header />
+                <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
                 <CardList cards={cards} />
               </>
             )}
