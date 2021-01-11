@@ -1,19 +1,11 @@
 import React, { Component } from 'react';
-import {
-  AppState,
-  AppProps,
-  TGenres,
-  IMoovieResponse,
-  IResults,
-  IMoovieResponse2,
-} from './components/types/interfaces';
+import { AppState, AppProps, TGenres, IMoovieResponse, IResults, IMoovieCard } from './components/types/interfaces';
 import MoovieDB from './components/getData';
 import Header from './components/layout/Header';
-import MooviesList from './components/layout/MooviesList';
+import CardList from './components/layout/CardList';
 
 import './App.scss';
 
-// TODO: Types!!!
 export default class App extends Component<AppProps, AppState> {
   moovieDB = new MoovieDB();
 
@@ -33,8 +25,8 @@ export default class App extends Component<AppProps, AppState> {
         .then((res) => res.genres)
         .then((res) => {
           const result: TGenres = {};
-          for (const item of res) {
-            result[item.id] = item.name;
+          for (const genre of res) {
+            result[genre.id] = genre.name;
           }
           return result;
         }),
@@ -50,7 +42,7 @@ export default class App extends Component<AppProps, AppState> {
         return cards;
       })
       .then((res) => {
-        const cards = res.reduce((acc: IResults[], el: IMoovieResponse2) => {
+        const cards = res.reduce((acc: IResults[], el: IMoovieCard) => {
           const card: IResults = {
             genres: el.genre_ids,
             id: el.id,
@@ -76,7 +68,7 @@ export default class App extends Component<AppProps, AppState> {
     return (
       <>
         <Header />
-        <MooviesList moovies={cards} />
+        <CardList moovies={cards} />
       </>
     );
   }

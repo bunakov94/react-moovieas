@@ -41,7 +41,7 @@ export interface IMoovieResponse {
   vote_count: number;
 }
 
-export interface IMoovieResponse2 {
+export interface IMoovieCard {
   adult: boolean;
   backdrop_path: string;
   genre_ids: string[];
