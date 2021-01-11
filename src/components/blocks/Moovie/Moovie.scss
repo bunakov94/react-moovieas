@@ -48,14 +48,11 @@
         padding: 0 5px;
         text-align: center;
         vertical-align: middle;
+        margin-bottom: 5px;
       }
 
       .genre-item:not(:last-child) {
         margin-right: 13px;
-      }
-
-      .genre-item:nth-child(n + 4) {
-        margin-top: 5px;
       }
     }
     &__text {

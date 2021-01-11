@@ -1,30 +1,38 @@
 import React, { Component } from 'react';
-import { AppState, AppProps } from './components/types/interfaces';
+import {
+  AppState,
+  AppProps,
+  TGenres,
+  IMoovieResponse,
+  IResults,
+  IMoovieResponse2,
+} from './components/types/interfaces';
 import MoovieDB from './components/getData';
 import Header from './components/layout/Header';
 import MooviesList from './components/layout/MooviesList';
 
 import './App.scss';
 
+// TODO: Types!!!
 export default class App extends Component<AppProps, AppState> {
-  moovie = new MoovieDB();
+  moovieDB = new MoovieDB();
 
   constructor(props: AppState) {
     super(props);
 
     this.state = {
-      results: [],
+      cards: [],
     };
   }
 
   componentDidMount() {
     Promise.all([
-      this.moovie.getPage(5).then((res) => res.results),
-      this.moovie
+      this.moovieDB.getPage(5).then((res) => res.results),
+      this.moovieDB
         .getGenres()
         .then((res) => res.genres)
         .then((res) => {
-          const result: any = {};
+          const result: TGenres = {};
           for (const item of res) {
             result[item.id] = item.name;
           }
@@ -32,16 +40,18 @@ export default class App extends Component<AppProps, AppState> {
         }),
     ])
       .then((res) => {
-        res[0].forEach((element: any, index: number) => {
-          element.genre_ids.forEach((el: any, i: number) => {
-            res[0][index].genre_ids[i] = res[1][el];
+        const cards = res[0];
+        const genres = res[1];
+        cards.forEach((card: IMoovieResponse, cardIndex: number) => {
+          card.genre_ids.forEach((genreId: number, genreIndex: number) => {
+            cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
           });
         });
-        return res[0];
+        return cards;
       })
       .then((res) => {
-        const results = res.reduce((acc: any, el: any) => {
-          const item = {
+        const cards = res.reduce((acc: IResults[], el: IMoovieResponse2) => {
+          const card: IResults = {
             genres: el.genre_ids,
             id: el.id,
             description: el.overview,
@@ -51,22 +61,22 @@ export default class App extends Component<AppProps, AppState> {
             rating: el.vote_average,
             isRate: false,
           };
-          acc.push(item);
+          acc.push(card);
           return acc;
         }, []);
         this.setState({
-          results,
+          cards,
         });
       });
   }
 
   render() {
-    const { results } = this.state;
+    const { cards } = this.state;
 
     return (
       <>
         <Header />
-        <MooviesList moovies={results} />
+        <MooviesList moovies={cards} />
       </>
     );
   }
