@@ -4,6 +4,9 @@ export type AppState = {
   isError: boolean;
   searchValue: string;
   genres: Genres;
+  current: number;
+  totalCards: number;
+  errorMessage: string;
 };
 export type AppProps = {};
 

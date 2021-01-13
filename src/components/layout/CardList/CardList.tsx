@@ -6,9 +6,11 @@ import './CardList.scss';
 
 const CardList = ({ cards }: CardListProps) => (
   <main className="moovie-list">
-    {cards.map((card: ICard) => (
-      <Card key={card.id} {...card} />
-    ))}
+    {cards.length ? (
+      cards.map((card: ICard) => <Card key={card.id} {...card} />)
+    ) : (
+      <h2 className="empty">There are no results for your request.</h2>
+    )}
   </main>
 );
 

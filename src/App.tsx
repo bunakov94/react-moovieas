@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Alert } from 'antd';
+import debounce from 'lodash/debounce';
+import { Alert, Pagination } from 'antd';
 
 import {
   AppState,
@@ -20,6 +21,52 @@ import './App.scss';
 export default class App extends Component<AppProps, AppState> {
   moovieDB = new MoovieDB();
 
+  getData = debounce((text) => {
+    const { genres, current } = this.state;
+    if (text !== '') {
+      this.setState({ isLoading: true });
+      new Promise((resolve) => {
+        const result = this.moovieDB.getPage(current, text).then((res) => {
+          this.setState({ totalCards: res.total_results });
+          return res.results;
+        });
+
+        resolve(result);
+      })
+        .then((res) => {
+          const cards = res as IMoovieDBRespons[];
+          cards.forEach((card, cardIndex) => {
+            card.genre_ids.forEach((genreId: number, genreIndex: number) => {
+              cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
+            });
+          });
+          return cards;
+        })
+        .then((res) => {
+          const cards = res.reduce((acc: ICard[], el: IMoovieDBResponsWithGenres) => {
+            const card: ICard = {
+              genres: el.genre_ids,
+              id: el.id,
+              description: el.overview,
+              poster: el.poster_path,
+              release: el.release_date,
+              title: el.title,
+              rating: el.vote_average,
+              isRate: false,
+            };
+            acc.push(card);
+            return acc;
+          }, []);
+          this.setState({
+            cards,
+            isLoading: false,
+            isError: false,
+          });
+        })
+        .catch((error) => this.onError(error));
+    }
+  }, 1000);
+
   constructor(props: AppState) {
     super(props);
 
@@ -29,14 +76,21 @@ export default class App extends Component<AppProps, AppState> {
       isError: false,
       searchValue: 'return',
       genres: {},
+      current: 1,
+      totalCards: 0,
+      errorMessage: '',
     };
   }
 
   componentDidMount() {
-    const { searchValue } = this.state;
+    const { searchValue, current } = this.state;
     if (searchValue !== '') {
       Promise.all([
-        this.moovieDB.getPage(1, searchValue).then((res) => res.results),
+        this.moovieDB.getPage(current, searchValue).then((res) => {
+          this.setState({ totalCards: res.total_results });
+
+          return res.results;
+        }),
         this.moovieDB
           .getGenres()
           .then((res) => res.genres)
@@ -83,57 +137,29 @@ export default class App extends Component<AppProps, AppState> {
     }
   }
 
-  onError = () => {
-    this.setState({ isError: true, isLoading: false });
-  };
-
-  onChangeInput = (text: string) => {
-    const { genres } = this.state;
-
-    this.setState({ searchValue: text });
-    if (text !== '') {
-      // TODO:
-      // Debounce
-      // Offline
-      new Promise((resolve) => {
-        const result = this.moovieDB.getPage(1, text).then((res) => res.results);
-        resolve(result);
-      })
-        .then((res) => {
-          const cards = res as IMoovieDBRespons[];
-          cards.forEach((card, cardIndex) => {
-            card.genre_ids.forEach((genreId: number, genreIndex: number) => {
-              cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
-            });
-          });
-          return cards;
-        })
-        .then((res) => {
-          const cards = res.reduce((acc: ICard[], el: IMoovieDBResponsWithGenres) => {
-            const card: ICard = {
-              genres: el.genre_ids,
-              id: el.id,
-              description: el.overview,
-              poster: el.poster_path,
-              release: el.release_date,
-              title: el.title,
-              rating: el.vote_average,
-              isRate: false,
-            };
-            acc.push(card);
-            return acc;
-          }, []);
-          this.setState({
-            cards,
-            isLoading: false,
-          });
-        })
-        .catch(this.onError);
+  onError = (error: any) => {
+    this.setState({ isError: true, errorMessage: error.message, isLoading: false });
+    if (!navigator.onLine) {
+      this.setState({ errorMessage: 'Lost connection...' });
     }
   };
 
+  onChangeInput = (text: string) => {
+    this.setState({ searchValue: text });
+    this.getData(text);
+  };
+
+  onChange = (page: number) => {
+    const { searchValue } = this.state;
+    this.setState({
+      current: page,
+      isLoading: true,
+    });
+    this.onChangeInput(searchValue);
+  };
+
   render() {
-    const { cards, isLoading, isError, searchValue } = this.state;
+    const { cards, isLoading, isError, searchValue, current, totalCards, errorMessage } = this.state;
 
     return (
       <>
@@ -143,13 +169,22 @@ export default class App extends Component<AppProps, AppState> {
           <>
             {isError ? (
               <>
-                <Header />
-                <Alert message="Error" description="Something wrong... Try again" type="error" showIcon />
+                <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
+                <Alert message="Error" description={errorMessage} type="error" showIcon />
               </>
             ) : (
               <>
                 <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
                 <CardList cards={cards} />
+                {cards.length ? (
+                  <Pagination
+                    current={current}
+                    defaultPageSize={20}
+                    showSizeChanger={false}
+                    onChange={this.onChange}
+                    total={totalCards}
+                  />
+                ) : null}
               </>
             )}
           </>

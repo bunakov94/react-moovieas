@@ -27,3 +27,16 @@ html {
   padding: 15px 36px;
   max-width: 1010px;
 }
+
+.ant-pagination {
+  display: flex;
+  justify-content: center;
+}
+
+.empty {
+  margin-top: 200px;
+  width: 100%;
+  text-align: center;
+  font-size: 40px;
+  font-weight: bold;
+}
