@@ -1,5 +1,6 @@
 import React from 'react';
 import format from 'date-fns/format';
+import { Rate } from 'antd';
 import { ICard } from '../../types/interfaces';
 import './Card.scss';
 
@@ -40,13 +41,14 @@ const Card = ({ genres, description, poster, release, title, rating }: ICard) =>
                   <li className="genres-item" key={index.toLocaleString()}>
                     <span className="genre-item">{genre}</span>
                   </li>
-                  // eslint-disable-next-line @typescript-eslint/indent
                 ))}
               </ul>
             ) : null}
           </div>
           <p className="movie-description__text">{cutTex(description, 210)}</p>
-          <footer className="movie-description__footer-rating">{rating}</footer>
+          <footer className="movie-description__footer-rating">
+            <Rate allowHalf defaultValue={0} count={10} />
+          </footer>
         </div>
       </article>
     </>
