@@ -28,7 +28,7 @@ export type Genres = {
   [id: number]: string;
 };
 
-export interface IMoovieDBRespons {
+export interface ImovieDBRespons {
   adult: boolean;
   backdrop_path: string;
   genre_ids: any;
@@ -45,7 +45,7 @@ export interface IMoovieDBRespons {
   vote_count: number;
 }
 
-export interface IMoovieDBResponsWithGenres {
+export interface ImovieDBResponsWithGenres {
   adult: boolean;
   backdrop_path: string;
   genre_ids: string[];

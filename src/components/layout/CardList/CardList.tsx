@@ -5,7 +5,7 @@ import Card from '../../blocks/Card';
 import './CardList.scss';
 
 const CardList = ({ cards }: CardListProps) => (
-  <main className="moovie-list">
+  <main className="movie-list">
     {cards.length ? (
       cards.map((card: ICard) => <Card key={card.id} {...card} />)
     ) : (

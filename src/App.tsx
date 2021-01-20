@@ -6,11 +6,11 @@ import {
   AppState,
   AppProps,
   Genres,
-  IMoovieDBRespons,
+  ImovieDBRespons,
   ICard,
-  IMoovieDBResponsWithGenres,
+  ImovieDBResponsWithGenres,
 } from './components/types/interfaces';
-import MoovieDB from './components/getData';
+import MovieDB from './components/getData';
 import 'antd/dist/antd.css';
 import Spiner from './components/blocks/Spiner';
 import Header from './components/layout/Header';
@@ -19,14 +19,14 @@ import CardList from './components/layout/CardList';
 import './App.scss';
 
 export default class App extends Component<AppProps, AppState> {
-  moovieDB = new MoovieDB();
+  movieDB = new MovieDB();
 
   getData = debounce((text) => {
     const { genres, current } = this.state;
     if (text !== '') {
       this.setState({ isLoading: true });
       new Promise((resolve) => {
-        const result = this.moovieDB.getPage(current, text).then((res) => {
+        const result = this.movieDB.getPage(current, text).then((res) => {
           this.setState({ totalCards: res.total_results });
           return res.results;
         });
@@ -34,7 +34,7 @@ export default class App extends Component<AppProps, AppState> {
         resolve(result);
       })
         .then((res) => {
-          const cards = res as IMoovieDBRespons[];
+          const cards = res as ImovieDBRespons[];
           cards.forEach((card, cardIndex) => {
             card.genre_ids.forEach((genreId: number, genreIndex: number) => {
               cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
@@ -43,7 +43,7 @@ export default class App extends Component<AppProps, AppState> {
           return cards;
         })
         .then((res) => {
-          const cards = res.reduce((acc: ICard[], el: IMoovieDBResponsWithGenres) => {
+          const cards = res.reduce((acc: ICard[], el: ImovieDBResponsWithGenres) => {
             const card: ICard = {
               genres: el.genre_ids,
               id: el.id,
@@ -86,12 +86,11 @@ export default class App extends Component<AppProps, AppState> {
     const { searchValue, current } = this.state;
     if (searchValue !== '') {
       Promise.all([
-        this.moovieDB.getPage(current, searchValue).then((res) => {
+        this.movieDB.getPage(current, searchValue).then((res) => {
           this.setState({ totalCards: res.total_results });
-
           return res.results;
         }),
-        this.moovieDB
+        this.movieDB
           .getGenres()
           .then((res) => res.genres)
           .then((res) => {
@@ -106,7 +105,7 @@ export default class App extends Component<AppProps, AppState> {
         .then((res) => {
           const cards = res[0];
           const genres = res[1];
-          cards.forEach((card: IMoovieDBRespons, cardIndex: number) => {
+          cards.forEach((card: ImovieDBRespons, cardIndex: number) => {
             card.genre_ids.forEach((genreId: number, genreIndex: number) => {
               cards[cardIndex].genre_ids[genreIndex] = genres[genreId];
             });
@@ -114,7 +113,7 @@ export default class App extends Component<AppProps, AppState> {
           return cards;
         })
         .then((res) => {
-          const cards = res.reduce((acc: ICard[], el: IMoovieDBResponsWithGenres) => {
+          const cards = res.reduce((acc: ICard[], el: ImovieDBResponsWithGenres) => {
             const card: ICard = {
               genres: el.genre_ids,
               id: el.id,
@@ -163,30 +162,24 @@ export default class App extends Component<AppProps, AppState> {
 
     return (
       <>
-        {isLoading ? (
-          <Spiner />
+        {isError ? (
+          <>
+            <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
+            <Alert message="Error" description={errorMessage} type="error" showIcon />
+          </>
         ) : (
           <>
-            {isError ? (
-              <>
-                <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
-                <Alert message="Error" description={errorMessage} type="error" showIcon />
-              </>
-            ) : (
-              <>
-                <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
-                <CardList cards={cards} />
-                {cards.length ? (
-                  <Pagination
-                    current={current}
-                    defaultPageSize={20}
-                    showSizeChanger={false}
-                    onChange={this.onChange}
-                    total={totalCards}
-                  />
-                ) : null}
-              </>
-            )}
+            <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
+            {isLoading ? <Spiner /> : <CardList cards={cards} />}
+            {cards.length && !isLoading ? (
+              <Pagination
+                current={current}
+                defaultPageSize={20}
+                showSizeChanger={false}
+                onChange={this.onChange}
+                total={totalCards}
+              />
+            ) : null}
           </>
         )}
       </>

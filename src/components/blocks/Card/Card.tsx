@@ -15,36 +15,38 @@ const Card = ({ genres, description, poster, release, title, rating }: ICard) =>
 
   return (
     <>
-      <article className="moovie">
+      <article className="movie">
         <img
-          className="moovie__poster"
+          className="movie__poster"
           src={
             poster
-              ? `https://image.tmdb.org/t/p/original${poster}`
+              ? `https://image.tmdb.org/t/p/w342${poster}`
               : 'https://geodis.com/nz/sites/default/files/styles/max_800x800/public/2018-06/404.png?itok=3QGHNj64'
           }
           alt="poster"
         />
-        <div className="moovie-description">
-          <header className="moovie-description__header">
-            <h1 className="moovie-description__name">{title}</h1>
-            <div className="moovie-description__rating">{rating}</div>
+        <div className="movie-description">
+          <header className="movie-description__header">
+            <h1 className="movie-description__name">{title}</h1>
+            <div className="movie-description__rating">{rating}</div>
           </header>
-          <p className="moovie-description__release">
+          <p className="movie-description__release">
             {release ? format(new Date(release), 'LLLL d, yyyy') : 'Unknown'}
           </p>
-          <div className="moovie-description__genre">
-            {genres
-              ? genres.map((genre, index) => (
-                  <span key={index.toLocaleString()} className="genre-item">
-                    {genre}
-                  </span>
+          <div className="movie-description__genre">
+            {genres ? (
+              <ul className="genres-list">
+                {genres.map((genre, index) => (
+                  <li className="genres-item" key={index.toLocaleString()}>
+                    <span className="genre-item">{genre}</span>
+                  </li>
                   // eslint-disable-next-line @typescript-eslint/indent
-                ))
-              : null}
+                ))}
+              </ul>
+            ) : null}
           </div>
-          <p className="moovie-description__text">{cutTex(description, 210)}</p>
-          <footer className="moovie-description__footer-rating">{rating}</footer>
+          <p className="movie-description__text">{cutTex(description, 210)}</p>
+          <footer className="movie-description__footer-rating">{rating}</footer>
         </div>
       </article>
     </>

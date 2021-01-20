@@ -1,4 +1,4 @@
-export default class MoovieDB {
+export default class MovieDB {
   apiBaseUrl = 'https://api.themoviedb.org/3/';
 
   async getResources(url: string) {
