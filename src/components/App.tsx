@@ -1,32 +1,28 @@
 import React, { Component } from 'react';
 import debounce from 'lodash/debounce';
-import { Alert, Pagination } from 'antd';
+import { Tabs, Pagination, Alert } from 'antd';
+import { MovieProvider } from './helpers/MovieDB-contest';
 
-import {
-  AppState,
-  AppProps,
-  Genres,
-  ImovieDBRespons,
-  ICard,
-  ImovieDBResponsWithGenres,
-} from './components/types/interfaces';
-import MovieDB from './components/getData';
+import { AppState, AppProps, Genres, ImovieDBRespons, ICard, ImovieDBResponsWithGenres } from './types/interfaces';
+import MovieDB from './helpers/getData';
 import 'antd/dist/antd.css';
-import Spiner from './components/blocks/Spiner';
-import Header from './components/layout/Header';
-import CardList from './components/layout/CardList';
+import Spiner from './blocks/Spiner';
+import CardList from './layout/CardList';
 
 import './App.scss';
+import Search from './blocks/Search';
+
+const { TabPane } = Tabs;
 
 export default class App extends Component<AppProps, AppState> {
   movieDB = new MovieDB();
 
   getData = debounce((text) => {
-    const { genres, current } = this.state;
+    const { genres, currentPage } = this.state;
     if (text !== '') {
       this.setState({ isLoading: true });
       new Promise((resolve) => {
-        const result = this.movieDB.getPage(current, text).then((res) => {
+        const result = this.movieDB.getPage(currentPage, text).then((res) => {
           this.setState({ totalCards: res.total_results });
           return res.results;
         });
@@ -76,17 +72,17 @@ export default class App extends Component<AppProps, AppState> {
       isError: false,
       searchValue: 'return',
       genres: {},
-      current: 1,
+      currentPage: 1,
       totalCards: 0,
       errorMessage: '',
     };
   }
 
   componentDidMount() {
-    const { searchValue, current } = this.state;
+    const { searchValue, currentPage } = this.state;
     if (searchValue !== '') {
       Promise.all([
-        this.movieDB.getPage(current, searchValue).then((res) => {
+        this.movieDB.getPage(currentPage, searchValue).then((res) => {
           this.setState({ totalCards: res.total_results });
           return res.results;
         }),
@@ -151,38 +147,64 @@ export default class App extends Component<AppProps, AppState> {
   onChange = (page: number) => {
     const { searchValue } = this.state;
     this.setState({
-      current: page,
+      currentPage: page,
       isLoading: true,
     });
     this.onChangeInput(searchValue);
   };
 
   render() {
-    const { cards, isLoading, isError, searchValue, current, totalCards, errorMessage } = this.state;
+    const { cards, isLoading, isError, searchValue, currentPage, totalCards, errorMessage } = this.state;
 
     return (
-      <>
-        {isError ? (
-          <>
-            <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
-            <Alert message="Error" description={errorMessage} type="error" showIcon />
-          </>
-        ) : (
-          <>
-            <Header onChangeInput={this.onChangeInput} searchValue={searchValue} />
-            {isLoading ? <Spiner /> : <CardList cards={cards} />}
-            {cards.length && !isLoading ? (
-              <Pagination
-                current={current}
-                defaultPageSize={20}
-                showSizeChanger={false}
-                onChange={this.onChange}
-                total={totalCards}
-              />
-            ) : null}
-          </>
-        )}
-      </>
+      <MovieProvider value={this.movieDB}>
+        <Tabs defaultActiveKey="1" centered>
+          <TabPane tab="Search" key="1">
+            {isError ? (
+              <>
+                <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
+                <Alert message="Error" description={errorMessage} type="error" showIcon />
+              </>
+            ) : (
+              <>
+                <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
+                {isLoading ? <Spiner /> : <CardList cards={cards} />}
+                {cards.length && !isLoading ? (
+                  <Pagination
+                    current={currentPage}
+                    defaultPageSize={20}
+                    showSizeChanger={false}
+                    onChange={this.onChange}
+                    total={totalCards}
+                  />
+                ) : null}
+              </>
+            )}
+          </TabPane>
+          <TabPane tab="Rated" key="2">
+            {isError ? (
+              <>
+                <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
+                <Alert message="Error" description={errorMessage} type="error" showIcon />
+              </>
+            ) : (
+              <>
+                <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
+                {isLoading ? <Spiner /> : <CardList cards={cards} />}
+                {cards.length && !isLoading ? (
+                  <Pagination
+                    current={currentPage}
+                    defaultPageSize={20}
+                    showSizeChanger={false}
+                    onChange={this.onChange}
+                    total={totalCards}
+                  />
+                ) : null}
+              </>
+            )}
+          </TabPane>
+        </Tabs>
+      </MovieProvider>
     );
   }
 }
