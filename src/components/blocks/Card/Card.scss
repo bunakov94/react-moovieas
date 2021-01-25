@@ -20,6 +20,8 @@
   .movie-description {
     max-width: 268px;
     padding: 12px 10px 0 20px;
+    display: flex;
+    flex-direction: column;
     &__header {
       display: flex;
     }
@@ -29,7 +31,12 @@
       font-weight: 400;
     }
     &__rating {
-      display: none;
+      width: 30px;
+      height: 30px;
+      border: 2px solid #E9D100;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-left: 10px;
     }
     &__release {
       margin-top: 7px;
@@ -72,4 +79,8 @@ ul {
 
 .genres-item:not(:last-child) {
   margin-right: 5px;
+}
+
+.ant-rate-star {
+  width: 16px;
 }

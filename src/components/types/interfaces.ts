@@ -3,25 +3,38 @@ export type AppState = {
   isLoading: boolean;
   isError: boolean;
   searchValue: string;
-  genres: Genres;
+  genresList: Genres;
   currentPage: number;
   totalCards: number;
   errorMessage: string;
+  guestSessionId: string;
+  rated: ICard[];
+  totalCardsRated: number;
 };
 export type AppProps = {};
 
 export type CardListProps = {
   cards: ICard[];
+  guestSessionId: string;
 };
 export interface ICard {
-  genres: string[];
+  genres: any[];
   id: number;
   description: string;
   poster: string;
   release: string;
   title: string;
   rating: number;
-  isRate: boolean;
+}
+
+export interface ICard2 {
+  genres: any[];
+  id: number;
+  description: string;
+  poster: string;
+  release: string;
+  title: string;
+  rating: number;
 }
 
 export type Genres = {
@@ -43,6 +56,7 @@ export interface ImovieDBRespons {
   video: boolean;
   vote_average: number;
   vote_count: number;
+  rating: number;
 }
 
 export interface ImovieDBResponsWithGenres {
@@ -60,4 +74,5 @@ export interface ImovieDBResponsWithGenres {
   video: boolean;
   vote_average: number;
   vote_count: number;
+  rating: number;
 }
