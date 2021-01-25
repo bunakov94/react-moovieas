@@ -32,6 +32,7 @@ export default class App extends Component<AppProps, AppState> {
               release: el.release_date,
               title: el.title,
               rating: el.rating,
+              average: el.vote_average,
             };
             acc.push(card);
             return acc;
@@ -81,6 +82,7 @@ export default class App extends Component<AppProps, AppState> {
               release: el.release_date,
               title: el.title,
               rating: el.rating,
+              average: el.vote_average,
             };
             acc.push(card);
             return acc;
@@ -140,6 +142,7 @@ export default class App extends Component<AppProps, AppState> {
           release: el.release_date,
           title: el.title,
           rating: el.rating,
+          average: el.vote_average,
         };
         acc.push(card);
         return acc;

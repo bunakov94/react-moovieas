@@ -27,16 +27,30 @@
     }
     &__name {
       margin: 0;
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 400;
     }
     &__rating {
       width: 30px;
       height: 30px;
-      border: 2px solid #E9D100;
       border-radius: 50%;
       flex-shrink: 0;
-      margin-left: 10px;
+      margin-left: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      &--red {
+        border: 2px solid #E90000;
+      }
+      &--orange {
+        border: 2px solid #E97E00;
+      }
+      &--yellow {
+        border: 2px solid #E9D100;
+      }
+      &--green {
+        border: 2px solid #66E900;
+      }
     }
     &__release {
       margin-top: 7px;
@@ -63,7 +77,8 @@
       margin-top: 10px;
     }
     &__footer-rating {
-
+      margin-top: auto;
+      margin-bottom: 20px;
     }
   }
 }

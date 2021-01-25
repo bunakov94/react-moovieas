@@ -1,12 +1,15 @@
 import React from 'react';
 import format from 'date-fns/format';
+import classNames from 'classnames';
 import { Rate } from 'antd';
 import { MovieConsumer } from '../../helpers/MovieDB-contest';
-import { Genres } from '../../types/interfaces';
-import './Card.scss';
 import MovieDB from '../../helpers/getData';
 
-const Card = ({ genres, description, poster, release, title, rating, id, guestSessionId }: any) => {
+import { CardListProps, Genres } from '../../types/interfaces';
+
+import './Card.scss';
+
+const Card = ({ genres, description, poster, release, title, rating, id, guestSessionId, average }: CardListProps) => {
   const movieDB = new MovieDB();
 
   const cutTex = (text: string, limit: number) => {
@@ -34,7 +37,16 @@ const Card = ({ genres, description, poster, release, title, rating, id, guestSe
           <div className="movie-description">
             <header className="movie-description__header">
               <h1 className="movie-description__name">{title}</h1>
-              <div className="movie-description__rating">{rating}</div>
+              <div
+                className={classNames('movie-description__rating', {
+                  'movie-description__rating--red': average <= 3,
+                  'movie-description__rating--orange': average > 3 && average < 5,
+                  'movie-description__rating--yellow': average > 5 && average < 7,
+                  'movie-description__rating--green': average > 7,
+                })}
+              >
+                {average}
+              </div>
             </header>
             <p className="movie-description__release">
               {release ? format(new Date(release), 'LLLL d, yyyy') : 'Unknown'}

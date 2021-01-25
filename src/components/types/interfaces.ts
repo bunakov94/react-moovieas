@@ -14,7 +14,14 @@ export type AppState = {
 export type AppProps = {};
 
 export type CardListProps = {
-  cards: ICard[];
+  genres: any[];
+  id: number;
+  description: string;
+  poster: string;
+  release: string;
+  title: string;
+  rating: number;
+  average: number;
   guestSessionId: string;
 };
 export interface ICard {
@@ -25,6 +32,7 @@ export interface ICard {
   release: string;
   title: string;
   rating: number;
+  average: number;
 }
 
 export interface ICard2 {
@@ -35,6 +43,8 @@ export interface ICard2 {
   release: string;
   title: string;
   rating: number;
+  average: number;
+  guestSessionId: string;
 }
 
 export type Genres = {
