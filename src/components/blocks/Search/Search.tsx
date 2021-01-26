@@ -1,7 +1,8 @@
 import React from 'react';
+import { SearchProps } from '../../types/interfaces';
 import './Search.scss';
 
-const Search = ({ onChangeInput, searchValue }: any) => {
+const Search = ({ onChangeInput, searchValue }: SearchProps) => {
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     onChangeInput(value);

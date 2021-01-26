@@ -3,8 +3,8 @@ import debounce from 'lodash/debounce';
 import { Tabs, Pagination, Alert } from 'antd';
 import { MovieProvider } from './helpers/MovieDB-contest';
 
-import { AppState, AppProps, Genres, ICard, ImovieDBResponsWithGenres } from './types/interfaces';
-import MovieDB from './helpers/getData';
+import { AppState, AppProps, ICard, Genres } from './types/interfaces';
+import MovieDB from './helpers/MovieDB';
 import 'antd/dist/antd.css';
 import Spiner from './blocks/Spiner';
 import CardList from './layout/CardList';
@@ -17,34 +17,18 @@ const { TabPane } = Tabs;
 export default class App extends Component<AppProps, AppState> {
   movieDB = new MovieDB();
 
-  getData = debounce((text) => {
+  getMovie = debounce((text: string) => {
     const { currentPage } = this.state;
     if (text !== '') {
       this.setState({ isLoading: true });
-      new Promise((resolve) => {
-        const result = this.movieDB.getPage(currentPage, text).then((res) => {
-          const cards = res.results.reduce((acc: ICard[], el: ImovieDBResponsWithGenres) => {
-            const card: ICard = {
-              genres: el.genre_ids,
-              id: el.id,
-              description: el.overview,
-              poster: el.poster_path,
-              release: el.release_date,
-              title: el.title,
-              rating: el.rating,
-              average: el.vote_average,
-            };
-            acc.push(card);
-            return acc;
-          }, []);
+      this.movieDB
+        .getPage(currentPage, text)
+        .then((res: { cards: ICard[]; totalCards: number }) => {
           this.setState({
-            cards,
-            totalCards: res.total_results,
+            cards: res.cards,
+            totalCards: res.totalCards,
           });
-        });
-
-        resolve(result);
-      })
+        })
         .then(() => this.setState({ isLoading: false }))
         .catch((error) => this.onError(error));
     }
@@ -64,7 +48,6 @@ export default class App extends Component<AppProps, AppState> {
       errorMessage: '',
       guestSessionId: '',
       rated: [],
-      totalCardsRated: 0,
     };
   }
 
@@ -72,26 +55,13 @@ export default class App extends Component<AppProps, AppState> {
     const { searchValue, currentPage } = this.state;
     if (searchValue !== '') {
       Promise.all([
-        this.movieDB.getPage(currentPage, searchValue).then((res) => {
-          const cards = res.results.reduce((acc: ICard[], el: ImovieDBResponsWithGenres) => {
-            const card: ICard = {
-              genres: el.genre_ids,
-              id: el.id,
-              description: el.overview,
-              poster: el.poster_path,
-              release: el.release_date,
-              title: el.title,
-              rating: el.rating,
-              average: el.vote_average,
-            };
-            acc.push(card);
-            return acc;
-          }, []);
+        this.movieDB.getPage(currentPage, searchValue).then((res: { cards: ICard[]; totalCards: number }) => {
           this.setState({
-            cards,
-            totalCards: res.total_results,
+            cards: res.cards,
+            totalCards: res.totalCards,
           });
         }),
+
         this.movieDB
           .getGenres()
           .then((res) => res.genres)
@@ -102,6 +72,7 @@ export default class App extends Component<AppProps, AppState> {
             }
             this.setState({ genresList: result });
           }),
+
         this.movieDB.getGuestId().then((res) => this.setState({ guestSessionId: res.guest_session_id })),
       ])
         .then(() => this.setState({ isLoading: false }))
@@ -109,7 +80,7 @@ export default class App extends Component<AppProps, AppState> {
     }
   }
 
-  onError = (error: any) => {
+  onError = (error: Error) => {
     this.setState({ isError: true, errorMessage: error.message, isLoading: false });
     if (!navigator.onLine) {
       this.setState({ errorMessage: 'Lost connection...' });
@@ -118,10 +89,10 @@ export default class App extends Component<AppProps, AppState> {
 
   onChangeInput = (text: string) => {
     this.setState({ searchValue: text });
-    this.getData(text);
+    this.getMovie(text);
   };
 
-  onChange = (page: number) => {
+  onChangePage = (page: number) => {
     const { searchValue } = this.state;
     this.setState({
       currentPage: page,
@@ -130,28 +101,17 @@ export default class App extends Component<AppProps, AppState> {
     this.onChangeInput(searchValue);
   };
 
-  getRated = () => {
+  getRatedMovie = () => {
     const { guestSessionId } = this.state;
-    this.movieDB.getRatedMovies(guestSessionId).then((res) => {
-      const cards = res.results.reduce((acc: ICard[], el: ImovieDBResponsWithGenres) => {
-        const card: ICard = {
-          genres: el.genre_ids,
-          id: el.id,
-          description: el.overview,
-          poster: el.poster_path,
-          release: el.release_date,
-          title: el.title,
-          rating: el.rating,
-          average: el.vote_average,
-        };
-        acc.push(card);
-        return acc;
-      }, []);
-      this.setState({
-        rated: cards,
-        totalCardsRated: res.total_results,
-      });
-    });
+    this.movieDB
+      .getPage(undefined, undefined, guestSessionId)
+      .then((res) => {
+        this.setState({
+          rated: res.cards,
+        });
+      })
+      .then(() => this.setState({ isLoading: false }))
+      .catch((error) => this.onError(error));
   };
 
   render() {
@@ -166,58 +126,29 @@ export default class App extends Component<AppProps, AppState> {
       genresList,
       guestSessionId,
       rated,
-      totalCardsRated,
     } = this.state;
     return (
       <MovieProvider value={genresList}>
-        <Tabs
-          defaultActiveKey="1"
-          centered
-          onChange={() => {
-            this.getRated();
-          }}
-        >
+        <Tabs defaultActiveKey="1" centered onChange={() => this.getRatedMovie()}>
           <TabPane tab="Search" key="1">
-            {isError ? (
-              <>
-                <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
-                <Alert message="Error" description={errorMessage} type="error" showIcon />
-              </>
-            ) : (
-              <>
-                <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
-                {isLoading ? <Spiner /> : <CardList cards={cards} guestSessionId={guestSessionId} />}
-                {totalCards > 20 && !isLoading ? (
-                  <Pagination
-                    current={currentPage}
-                    defaultPageSize={20}
-                    showSizeChanger={false}
-                    onChange={this.onChange}
-                    total={totalCards}
-                  />
-                ) : null}
-              </>
+            <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
+            {isLoading && <Spiner />}
+            {isError && <Alert message="Error" description={errorMessage} type="error" showIcon />}
+            {!isLoading && !isError && <CardList cards={cards} guestSessionId={guestSessionId} />}
+            {totalCards > 20 && !isLoading && !isError && (
+              <Pagination
+                current={currentPage}
+                defaultPageSize={20}
+                showSizeChanger={false}
+                onChange={this.onChangePage}
+                total={totalCards}
+              />
             )}
           </TabPane>
           <TabPane tab="Rated" key="2">
-            {isError ? (
-              <>
-                <Alert message="Error" description={errorMessage} type="error" showIcon />
-              </>
-            ) : (
-              <>
-                {isLoading ? <Spiner /> : <CardList cards={rated} guestSessionId={guestSessionId} />}
-                {totalCardsRated > 20 && !isLoading ? (
-                  <Pagination
-                    current={currentPage}
-                    defaultPageSize={20}
-                    showSizeChanger={false}
-                    onChange={this.onChange}
-                    total={totalCardsRated}
-                  />
-                ) : null}
-              </>
-            )}
+            {isError && <Alert message="Error" description={errorMessage} type="error" showIcon />}
+            {isLoading && <Spiner />}
+            {!isLoading && !isError && <CardList cards={rated} guestSessionId={guestSessionId} />}
           </TabPane>
         </Tabs>
       </MovieProvider>

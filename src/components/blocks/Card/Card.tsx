@@ -3,13 +3,13 @@ import format from 'date-fns/format';
 import classNames from 'classnames';
 import { Rate } from 'antd';
 import { MovieConsumer } from '../../helpers/MovieDB-contest';
-import MovieDB from '../../helpers/getData';
+import MovieDB from '../../helpers/MovieDB';
 
-import { CardListProps, Genres } from '../../types/interfaces';
+import { CardProps, Genres } from '../../types/interfaces';
 
 import './Card.scss';
 
-const Card = ({ genres, description, poster, release, title, rating, id, guestSessionId, average }: CardListProps) => {
+const Card = ({ genres, description, poster, release, title, rating, id, guestSessionId, average }: CardProps) => {
   const movieDB = new MovieDB();
 
   const cutTex = (text: string, limit: number) => {
@@ -39,10 +39,10 @@ const Card = ({ genres, description, poster, release, title, rating, id, guestSe
               <h1 className="movie-description__name">{title}</h1>
               <div
                 className={classNames('movie-description__rating', {
-                  'movie-description__rating--red': average <= 3,
-                  'movie-description__rating--orange': average > 3 && average < 5,
-                  'movie-description__rating--yellow': average > 5 && average < 7,
-                  'movie-description__rating--green': average > 7,
+                  'movie-description__rating--red': average < 3,
+                  'movie-description__rating--orange': average >= 3 && average <= 5,
+                  'movie-description__rating--yellow': average >= 5 && average <= 7,
+                  'movie-description__rating--green': average >= 7,
                 })}
               >
                 {average}
@@ -68,7 +68,7 @@ const Card = ({ genres, description, poster, release, title, rating, id, guestSe
                 className="stars"
                 defaultValue={rating}
                 count={10}
-                onChange={(rate) => movieDB.rateMovie(guestSessionId, rate, id)}
+                onChange={(rate: number) => movieDB.rateMovie(guestSessionId, rate, id)}
               />
             </footer>
           </div>

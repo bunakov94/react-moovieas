@@ -1,10 +1,10 @@
 import React from 'react';
-import { ICard } from '../../types/interfaces';
+import { ICard, CardListProps } from '../../types/interfaces';
 import Card from '../../blocks/Card';
 
 import './CardList.scss';
 
-const CardList = ({ cards, guestSessionId }: any) => (
+const CardList = ({ cards, guestSessionId }: CardListProps) => (
   <main className="movie-list">
     {cards.length ? (
       cards.map((card: ICard) => <Card key={card.id} {...card} guestSessionId={guestSessionId} />)

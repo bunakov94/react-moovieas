@@ -9,12 +9,11 @@ export type AppState = {
   errorMessage: string;
   guestSessionId: string;
   rated: ICard[];
-  totalCardsRated: number;
 };
 export type AppProps = {};
 
-export type CardListProps = {
-  genres: any[];
+export type CardProps = {
+  genres: number[];
   id: number;
   description: string;
   poster: string;
@@ -25,7 +24,7 @@ export type CardListProps = {
   guestSessionId: string;
 };
 export interface ICard {
-  genres: any[];
+  genres: number[];
   id: number;
   description: string;
   poster: string;
@@ -33,46 +32,16 @@ export interface ICard {
   title: string;
   rating: number;
   average: number;
-}
-
-export interface ICard2 {
-  genres: any[];
-  id: number;
-  description: string;
-  poster: string;
-  release: string;
-  title: string;
-  rating: number;
-  average: number;
-  guestSessionId: string;
 }
 
 export type Genres = {
-  [id: number]: string;
+  [id: number]: number;
 };
-
-export interface ImovieDBRespons {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: any;
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-  rating: number;
-}
 
 export interface ImovieDBResponsWithGenres {
   adult: boolean;
   backdrop_path: string;
-  genre_ids: string[];
+  genre_ids: number[];
   id: number;
   original_language: string;
   original_title: string;
@@ -86,3 +55,12 @@ export interface ImovieDBResponsWithGenres {
   vote_count: number;
   rating: number;
 }
+
+export type SearchProps = {
+  onChangeInput: (text: string) => void;
+  searchValue: string;
+};
+export type CardListProps = {
+  cards: ICard[];
+  guestSessionId: string;
+};
