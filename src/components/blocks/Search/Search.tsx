@@ -14,7 +14,7 @@ const Search = ({ onChangeInput, searchValue }: SearchProps) => {
   };
 
   return (
-    <form className="search-form" onSubmit={submitForm}>
+    <form className="search-form" autoComplete="off" onSubmit={submitForm}>
       <input
         type="text"
         name="search"

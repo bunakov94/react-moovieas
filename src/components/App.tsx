@@ -42,7 +42,7 @@ export default class App extends Component<AppProps, AppState> {
       cards: [],
       isLoading: true,
       isError: false,
-      searchValue: 'return',
+      searchValue: '',
       genresList: {},
       currentPage: 1,
       totalCards: 0,
