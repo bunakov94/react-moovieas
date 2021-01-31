@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-import { ICard, ImovieDBResponsWithGenres } from '../types/interfaces';
+import { ICard, ImovieDBResponseWithGenres } from '../types/interfaces';
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ export default class MovieDB {
       ? `guest_session/${sessionId}/rated/movies?api_key=${process.env.REACT_APP_API_KEY}&language=en-US`
       : `search/movie?api_key=${process.env.REACT_APP_API_KEY}&language=en-US&query=${query}&page=${pageNumber}&include_adult=false`;
     return this.getResources(url).then((res) => {
-      const cards = res.results.reduce((acc: ICard[], el: ImovieDBResponsWithGenres) => {
+      const cards = res.results.reduce((acc: ICard[], el: ImovieDBResponseWithGenres) => {
         const card: ICard = {
           genres: el.genre_ids,
           id: el.id,

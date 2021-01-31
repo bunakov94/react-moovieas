@@ -1,16 +1,3 @@
-export type AppState = {
-  cards: ICard[];
-  isLoading: boolean;
-  isError: boolean;
-  searchValue: string;
-  genresList: Genres;
-  currentPage: number;
-  totalCards: number;
-  errorMessage: string;
-  guestSessionId: string;
-  rated: ICard[];
-};
-
 export interface ICard {
   genres: number[];
   id: number;
@@ -22,26 +9,31 @@ export interface ICard {
   average: number;
 }
 
-export type AppProps = {};
-
-export type CardProps = {
-  genres: number[];
-  id: number;
-  description: string;
-  poster: string;
-  release: string;
-  title: string;
-  rating: number;
-  average: number;
+export interface AppState {
+  cards: ICard[];
+  isLoading: boolean;
+  isError: boolean;
+  searchValue: string;
+  genresList: Genres;
+  currentPage: number;
+  totalCards: number;
+  errorMessage: string;
   guestSessionId: string;
-  syncMovieRating: Function;
-};
+  rated: ICard[];
+}
+
+export interface AppProps {}
+
+export interface CardProps extends ICard {
+  guestSessionId: string;
+  syncMovieRating: (id: number, rate: number) => void;
+}
 
 export type Genres = {
   [id: number]: number;
 };
 
-export interface ImovieDBResponsWithGenres {
+export interface ImovieDBResponseWithGenres {
   adult: boolean;
   backdrop_path: string;
   genre_ids: number[];
@@ -59,12 +51,13 @@ export interface ImovieDBResponsWithGenres {
   rating: number;
 }
 
-export type SearchProps = {
+export interface SearchProps {
   onChangeInput: (text: string) => void;
   searchValue: string;
-};
-export type CardListProps = {
+}
+
+export interface CardListProps {
   cards: ICard[];
   guestSessionId: string;
-  syncMovieRating: Function;
-};
+  syncMovieRating: (id: number, rate: number) => void;
+}

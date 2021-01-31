@@ -89,6 +89,9 @@ export default class App extends Component<AppProps, AppState> {
 
   async getRatedMovie() {
     const { guestSessionId } = this.state;
+    this.setState({
+      isLoading: true,
+    });
 
     try {
       const result = await this.movieDB.getPage(undefined, undefined, guestSessionId);
@@ -119,6 +122,12 @@ export default class App extends Component<AppProps, AppState> {
     });
   };
 
+  changeTab = (activeKey: string) => {
+    if (+activeKey === 2) {
+      this.getRatedMovie();
+    }
+  };
+
   render() {
     const {
       cards,
@@ -134,7 +143,7 @@ export default class App extends Component<AppProps, AppState> {
     } = this.state;
     return (
       <MovieProvider value={genresList}>
-        <Tabs defaultActiveKey="1" centered onChange={() => this.getRatedMovie()}>
+        <Tabs defaultActiveKey="1" centered onChange={(key) => this.changeTab(key)}>
           <TabPane tab="Search" key="1">
             <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
             {isLoading && <Spiner />}
