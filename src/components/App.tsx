@@ -119,7 +119,9 @@ export default class App extends Component<AppProps, AppState> {
           rated[ratedIndex].rating = rate;
         }
       }
-      cards[cardIndex].rating = rate;
+      if (cardIndex !== -1) {
+        cards[cardIndex].rating = rate;
+      }
       return { cards, rated };
     });
   };
