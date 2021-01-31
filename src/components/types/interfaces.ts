@@ -10,6 +10,18 @@ export type AppState = {
   guestSessionId: string;
   rated: ICard[];
 };
+
+export interface ICard {
+  genres: number[];
+  id: number;
+  description: string;
+  poster: string;
+  release: string;
+  title: string;
+  rating: number;
+  average: number;
+}
+
 export type AppProps = {};
 
 export type CardProps = {
@@ -22,17 +34,8 @@ export type CardProps = {
   rating: number;
   average: number;
   guestSessionId: string;
+  syncMovieRating: Function;
 };
-export interface ICard {
-  genres: number[];
-  id: number;
-  description: string;
-  poster: string;
-  release: string;
-  title: string;
-  rating: number;
-  average: number;
-}
 
 export type Genres = {
   [id: number]: number;
@@ -63,4 +66,5 @@ export type SearchProps = {
 export type CardListProps = {
   cards: ICard[];
   guestSessionId: string;
+  syncMovieRating: Function;
 };

@@ -3,7 +3,7 @@ import debounce from 'lodash/debounce';
 import { Tabs, Pagination, Alert } from 'antd';
 import { MovieProvider } from './helpers/MovieDB-contest';
 
-import { AppState, AppProps, ICard, Genres } from './types/interfaces';
+import { AppState, AppProps, Genres } from './types/interfaces';
 import MovieDB from './helpers/MovieDB';
 import 'antd/dist/antd.css';
 import Spiner from './blocks/Spiner';
@@ -17,20 +17,21 @@ const { TabPane } = Tabs;
 export default class App extends Component<AppProps, AppState> {
   movieDB = new MovieDB();
 
-  getMovie = debounce((text: string) => {
+  getMovie = debounce(async (text: string) => {
     const { currentPage } = this.state;
-    if (text !== '') {
-      this.setState({ isLoading: true });
-      this.movieDB
-        .getPage(currentPage, text)
-        .then((res: { cards: ICard[]; totalCards: number }) => {
-          this.setState({
-            cards: res.cards,
-            totalCards: res.totalCards,
-          });
-        })
-        .then(() => this.setState({ isLoading: false }))
-        .catch((error) => this.onError(error));
+    try {
+      if (text.trim() !== '') {
+        this.setState({ isLoading: true });
+        const { cards, totalCards } = await this.movieDB.getPage(currentPage, text);
+        this.setState({
+          cards,
+          totalCards,
+          isLoading: false,
+          isError: false,
+        });
+      }
+    } catch (error) {
+      this.onError(error);
     }
   }, 1000);
 
@@ -41,7 +42,7 @@ export default class App extends Component<AppProps, AppState> {
       cards: [],
       isLoading: true,
       isError: false,
-      searchValue: 'return',
+      searchValue: '',
       genresList: {},
       currentPage: 1,
       totalCards: 0,
@@ -51,32 +52,17 @@ export default class App extends Component<AppProps, AppState> {
     };
   }
 
-  componentDidMount() {
-    const { searchValue, currentPage } = this.state;
-    if (searchValue !== '') {
-      Promise.all([
-        this.movieDB.getPage(currentPage, searchValue).then((res: { cards: ICard[]; totalCards: number }) => {
-          this.setState({
-            cards: res.cards,
-            totalCards: res.totalCards,
-          });
-        }),
-
-        this.movieDB
-          .getGenres()
-          .then((res) => res.genres)
-          .then((res) => {
-            const result: Genres = {};
-            for (const genre of res) {
-              result[genre.id] = genre.name;
-            }
-            this.setState({ genresList: result });
-          }),
-
-        this.movieDB.getGuestId().then((res) => this.setState({ guestSessionId: res.guest_session_id })),
-      ])
-        .then(() => this.setState({ isLoading: false }))
-        .catch(this.onError);
+  async componentDidMount() {
+    try {
+      const [genres, getGuestId] = await Promise.all([this.movieDB.getGenres(), this.movieDB.getGuestId()]);
+      const genresList: Genres = {};
+      for (const genre of genres.genres) {
+        genresList[genre.id] = genre.name;
+      }
+      const guestSessionId = getGuestId.guest_session_id;
+      this.setState({ genresList, guestSessionId, isLoading: false });
+    } catch (error) {
+      this.onError(error);
     }
   }
 
@@ -101,17 +87,36 @@ export default class App extends Component<AppProps, AppState> {
     this.onChangeInput(searchValue);
   };
 
-  getRatedMovie = () => {
+  async getRatedMovie() {
     const { guestSessionId } = this.state;
-    this.movieDB
-      .getPage(undefined, undefined, guestSessionId)
-      .then((res) => {
-        this.setState({
-          rated: res.cards,
-        });
-      })
-      .then(() => this.setState({ isLoading: false }))
-      .catch((error) => this.onError(error));
+
+    try {
+      const result = await this.movieDB.getPage(undefined, undefined, guestSessionId);
+      this.setState({
+        rated: result.cards,
+        isLoading: false,
+      });
+    } catch (error) {
+      this.onError(error);
+    }
+  }
+
+  syncMovieRating = (id: number, rate: number) => {
+    this.setState(({ cards: oldCards, rated: oldRated }) => {
+      const cards = oldCards;
+      const rated = oldRated;
+      const cardIndex = cards.findIndex((card) => card.id === id);
+      const ratedIndex = rated.findIndex((card) => card.id === id);
+      if (ratedIndex !== -1) {
+        if (rate === 0) {
+          rated.splice(ratedIndex, 1);
+        } else {
+          rated[ratedIndex].rating = rate;
+        }
+      }
+      cards[cardIndex].rating = rate;
+      return { cards, rated };
+    });
   };
 
   render() {
@@ -134,7 +139,9 @@ export default class App extends Component<AppProps, AppState> {
             <Search onChangeInput={this.onChangeInput} searchValue={searchValue} />
             {isLoading && <Spiner />}
             {isError && <Alert message="Error" description={errorMessage} type="error" showIcon />}
-            {!isLoading && !isError && <CardList cards={cards} guestSessionId={guestSessionId} />}
+            {!isLoading && !isError && (
+              <CardList cards={cards} guestSessionId={guestSessionId} syncMovieRating={this.syncMovieRating} />
+            )}
             {totalCards > 20 && !isLoading && !isError && (
               <Pagination
                 current={currentPage}
@@ -148,7 +155,9 @@ export default class App extends Component<AppProps, AppState> {
           <TabPane tab="Rated" key="2">
             {isError && <Alert message="Error" description={errorMessage} type="error" showIcon />}
             {isLoading && <Spiner />}
-            {!isLoading && !isError && <CardList cards={rated} guestSessionId={guestSessionId} />}
+            {!isLoading && !isError && (
+              <CardList cards={rated} guestSessionId={guestSessionId} syncMovieRating={this.syncMovieRating} />
+            )}
           </TabPane>
         </Tabs>
       </MovieProvider>

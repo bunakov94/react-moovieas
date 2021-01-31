@@ -9,16 +9,39 @@ import { CardProps, Genres } from '../../types/interfaces';
 
 import './Card.scss';
 
-const Card = ({ genres, description, poster, release, title, rating, id, guestSessionId, average }: CardProps) => {
+const Card = ({
+  genres,
+  description,
+  poster,
+  release,
+  title,
+  rating,
+  id,
+  guestSessionId,
+  average,
+  syncMovieRating,
+}: CardProps) => {
   const movieDB = new MovieDB();
 
   const cutTex = (text: string, limit: number) => {
     if (text.length < limit) {
       return text;
     }
-    let res = text.slice(0, limit).split(' ').slice(0, -1).join(' ').replace(/,*$/, '');
-    res += '...';
-    return res;
+    const shortcutOverview = text.split(' ').slice(0, limit);
+    shortcutOverview.push('...');
+    return shortcutOverview.join(' ');
+  };
+
+  const giveRate = (rate: number) => movieDB.rateMovie(guestSessionId, rate, id);
+  const deleteMovie = () => movieDB.deleteMovie(guestSessionId, id);
+
+  const rateMovie = (rate: number) => {
+    if (rate < 0.5) {
+      deleteMovie();
+    } else {
+      giveRate(rate);
+    }
+    syncMovieRating(id, rate);
   };
 
   return (
@@ -62,14 +85,9 @@ const Card = ({ genres, description, poster, release, title, rating, id, guestSe
                 </ul>
               </div>
             )}
-            <p className="movie-description__text">{cutTex(description, 150)}</p>
+            <p className="movie-description__text">{cutTex(description, 20)}</p>
             <footer className="movie-description__footer-rating">
-              <Rate
-                className="stars"
-                defaultValue={rating}
-                count={10}
-                onChange={(rate: number) => movieDB.rateMovie(guestSessionId, rate, id)}
-              />
+              <Rate className="stars" value={rating} count={10} onChange={(rate: number) => rateMovie(rate)} />
             </footer>
           </div>
         </article>

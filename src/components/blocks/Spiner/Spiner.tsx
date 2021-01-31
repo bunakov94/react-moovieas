@@ -3,6 +3,6 @@ import { Spin } from 'antd';
 
 import './Spiner.scss';
 
-const Spiner = () => <Spin tip="Loading..." size="large" />;
+const Spiner = () => <Spin size="large" />;
 
 export default Spiner;
