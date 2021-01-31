@@ -44,32 +44,26 @@ const Card = ({
     syncMovieRating(id, rate);
   };
 
+  const posterURL = poster
+    ? `https://image.tmdb.org/t/p/w342${poster}`
+    : 'https://geodis.com/nz/sites/default/files/styles/max_800x800/public/2018-06/404.png?itok=3QGHNj64';
+
+  const ratingColor = classNames('movie-description__rating', {
+    'movie-description__rating--red': average < 3,
+    'movie-description__rating--orange': average >= 3 && average <= 5,
+    'movie-description__rating--yellow': average >= 5 && average <= 7,
+    'movie-description__rating--green': average >= 7,
+  });
+
   return (
     <MovieConsumer>
       {(genresList: Genres) => (
-        <article className="movie">
-          <img
-            className="movie__poster"
-            src={
-              poster
-                ? `https://image.tmdb.org/t/p/w342${poster}`
-                : 'https://geodis.com/nz/sites/default/files/styles/max_800x800/public/2018-06/404.png?itok=3QGHNj64'
-            }
-            alt="poster"
-          />
-          <div className="movie-description">
+        <div className="movie">
+          <img className="movie__poster img" src={posterURL} alt="poster" />
+          <div className="description">
             <header className="movie-description__header">
               <h1 className="movie-description__name">{title}</h1>
-              <div
-                className={classNames('movie-description__rating', {
-                  'movie-description__rating--red': average < 3,
-                  'movie-description__rating--orange': average >= 3 && average <= 5,
-                  'movie-description__rating--yellow': average >= 5 && average <= 7,
-                  'movie-description__rating--green': average >= 7,
-                })}
-              >
-                {average}
-              </div>
+              <div className={ratingColor}>{average}</div>
             </header>
             <p className="movie-description__release">
               {release ? format(new Date(release), 'LLLL d, yyyy') : 'Unknown'}
@@ -85,12 +79,10 @@ const Card = ({
                 </ul>
               </div>
             )}
-            <p className="movie-description__text">{cutTex(description, 20)}</p>
-            <footer className="movie-description__footer-rating">
-              <Rate className="stars" value={rating} count={10} onChange={(rate: number) => rateMovie(rate)} />
-            </footer>
           </div>
-        </article>
+          <p className="movie-description__text text">{cutTex(description, 25)}</p>
+          <Rate className="stars rating" value={rating} count={10} onChange={(rate: number) => rateMovie(rate)} />
+        </div>
       )}
     </MovieConsumer>
   );

@@ -24,19 +24,37 @@ html {
 
 .container {
   margin: 0 auto;
-  padding: 15px 36px;
+  padding: 20px 16px;
   max-width: 1010px;
+  height: 100%;
 }
 
 .ant-pagination {
   display: flex;
   justify-content: center;
+  margin-bottom: 20px;
+}
+
+.ant-tabs-tab {
+  width: 65px;
+  justify-content: center;
+  margin: 0;
+
+  &:first-child {
+    margin-right: 16px;
+  }
+}
+
+.ant-pagination-item-active a {
+  color: white;
+  background:#1890ff;
 }
 
 .empty {
-  margin-top: 200px;
   width: 100%;
+  margin-top: 100px;
   text-align: center;
-  font-size: 40px;
+  font-size: 20px;
   font-weight: bold;
 }
+

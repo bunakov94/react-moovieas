@@ -42,7 +42,7 @@ export default class App extends Component<AppProps, AppState> {
       cards: [],
       isLoading: true,
       isError: false,
-      searchValue: '',
+      searchValue: 'return',
       genresList: {},
       currentPage: 1,
       totalCards: 0,
@@ -53,7 +53,9 @@ export default class App extends Component<AppProps, AppState> {
   }
 
   async componentDidMount() {
+    const { searchValue } = this.state;
     try {
+      this.getMovie(searchValue);
       const [genres, getGuestId] = await Promise.all([this.movieDB.getGenres(), this.movieDB.getGuestId()]);
       const genresList: Genres = {};
       for (const genre of genres.genres) {
@@ -156,6 +158,7 @@ export default class App extends Component<AppProps, AppState> {
                 current={currentPage}
                 defaultPageSize={20}
                 showSizeChanger={false}
+                responsive
                 onChange={this.onChangePage}
                 total={totalCards}
               />
