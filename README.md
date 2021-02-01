@@ -1,3 +1,3 @@
 # React TS
 
-## https://react-moovieas.vercel.app/
+## https://react-movies-three.vercel.app/
